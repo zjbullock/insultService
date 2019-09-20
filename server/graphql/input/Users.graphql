@@ -1,0 +1,4 @@
+input Users {
+    to: String!
+    from: String!
+}

@@ -1,0 +1,3 @@
+type Query {
+    GetInsult(people: Users!): Insult!
+}
