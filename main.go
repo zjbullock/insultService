@@ -6,6 +6,7 @@ import (
 	"github.com/graph-gophers/graphql-go"
 	"github.com/juju/loggo"
 	"net/http"
+	"randomInsultService/datasource"
 	"randomInsultService/handler"
 	"randomInsultService/repository"
 	"randomInsultService/resolver"
@@ -28,11 +29,13 @@ func init() {
 	if err != nil {
 		l.Criticalf("error occurred while fetching graphql schema: %v", err)
 	}
+	projectId := "insult"
+	dataSource := datasource.NewDataSource(l, ctx, projectId)
 
 	repos := struct {
-		fire repository.FireBase
+		fire repository.FireStore
 	}{
-		fire: repository.NewFireBase(),
+		fire: repository.NewFireBase(ctx, dataSource, l),
 	}
 	services := struct {
 		Insult service.Insult

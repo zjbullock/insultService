@@ -12,3 +12,7 @@ type insultResolver struct {
 func (i *insultResolver) Message(_ context.Context) string {
 	return i.Insult.Message
 }
+
+func (i *insultResolver) FireStoreId(_ context.Context) *string {
+	return i.Insult.Id
+}
