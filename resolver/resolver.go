@@ -16,16 +16,9 @@ type Resolver struct {
 // GetInsult resolves an insult if any, and an error from the backend if present
 func (r *Resolver) GetInsult(ctx context.Context, args struct{ People *model.Users }) (*insultResolver, error) {
 	message, id, err := r.Services.Insult.GenerateInsult(*args.People)
-	if err != nil {
-		return &insultResolver{
-			Insult: model.Insult{
-				Message: message,
-				Id:      id,
-			},
-		}, err
-	}
 	insult := model.Insult{
-		Message: "",
+		Message: message,
+		Id:      id,
 	}
-	return &insultResolver{Insult: insult}, nil
+	return &insultResolver{Insult: insult}, err
 }
