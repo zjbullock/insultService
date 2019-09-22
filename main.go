@@ -23,8 +23,8 @@ var (
 
 func init() {
 	l.SetLogLevel(loggo.DEBUG)
-	server := server.NewServer(l)
-	schemaString, err := server.GetSchema("./server/graphql/", l)
+	serv := server.NewServer(l)
+	schemaString, err := serv.GetSchema("./server/graphql/", l)
 	if err != nil {
 		l.Criticalf("error occurred while fetching graphql schema: %v", err)
 	}
