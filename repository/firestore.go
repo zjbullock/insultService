@@ -57,14 +57,11 @@ func (f *fireStore) InsertEntry(insultContent model.InsultContent) (*string, err
 		return nil, errors.New(fmt.Sprintf("error Intializing data source: %v", err))
 	}
 	defer f.ds.CloseConnection()
-	d, wr, err := f.ds.InsertEntry(insultContent)
+	d, _, err := f.ds.InsertEntry(insultContent)
 	if err != nil {
 		//Should allow error to bubble up upon failure
 		f.log.Errorf("failed to create an insult doc for write: %v", err)
 		return nil, errors.New(fmt.Sprintf("error inserting insult doc: %v.  received error: %v", insultContent, err))
 	}
-	fmt.Printf("documentRef: %v\n", d)
-	fmt.Printf("writeResult: %v\n", wr)
-
 	return &d.ID, nil
 }

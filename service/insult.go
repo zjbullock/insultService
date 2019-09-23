@@ -35,7 +35,6 @@ func (i *insult) GenerateInsult(who model.Users) (message *string, id *string, e
 		return nil, nil, err
 	}
 	adj, noun, verb := randomWordChooser(words)
-	fmt.Printf("here are the words retrieved: %v\n", words)
 	insultContents := model.InsultContent{
 		Verb:      verb,
 		Adjective: adj,
