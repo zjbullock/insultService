@@ -35,7 +35,7 @@ func init() {
 	repos := struct {
 		fire repository.FireStore
 	}{
-		fire: repository.NewFireBase(ctx, dataSource, l),
+		fire: repository.NewFireStore(dataSource, l),
 	}
 	services := struct {
 		Insult service.Insult

@@ -1,7 +1,7 @@
 package model
 
 type Insult struct {
-	Message string  `json:"message"`
+	Message *string `json:"message"`
 	Id      *string `json:"fireStoreId"`
 }
 
