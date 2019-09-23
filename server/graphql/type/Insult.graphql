@@ -1,3 +1,4 @@
 type Insult {
-    message: String!
+    message: String
+    fireStoreId: String
 }

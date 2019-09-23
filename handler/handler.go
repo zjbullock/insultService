@@ -2,9 +2,8 @@ package handler
 
 import (
 	"context"
-	"github.com/graph-gophers/graphql-go/relay"
-
 	"github.com/graph-gophers/graphql-go"
+	"github.com/graph-gophers/graphql-go/relay"
 	"net/http"
 	"randomInsultService/service"
 )
