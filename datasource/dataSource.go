@@ -36,7 +36,7 @@ func NewDataSource(l loggo.Logger, ctx context.Context, projectId string) DataSo
 // OpenConnection returns an error if one is present.  It also sets a client within the fireStoreDB object.
 // The error is returned when firestore.NewClient fails to create a client.
 func (f *fireStoreDB) OpenConnection() error {
-	const jsonPath = "../insult-41aadfdfb47b.json"
+	const jsonPath = "./datasource/insultDB.json"
 	client, err := NewClient(f.ctx, f.projectId, option.WithCredentialsFile(jsonPath))
 	if err != nil {
 		f.log.Errorf("error initializing Fire Store client with projectId: %s. Received error: %v", f.projectId, err)

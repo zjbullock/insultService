@@ -44,7 +44,6 @@ func (f *fireStore) ReadAllWords() (*model.Words, error) {
 		f.log.Errorf("error converting document snap to a Words model")
 		return nil, errors.New(fmt.Sprintf("error converting document snap to a model.Words, :%v", err))
 	}
-	fmt.Println(words)
 	return &words, nil
 }
 

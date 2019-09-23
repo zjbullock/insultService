@@ -65,6 +65,18 @@ func insultMessage(users model.Users, adj, noun, verb string) string {
 	case 'a', 'e', 'i', 'o', 'u':
 		descriptor += "n"
 	}
-	insult := fmt.Sprintf("%s, you %s like %s %s %s. - %s", users.To, verb, descriptor, adj, noun, users.From)
+	rand.Seed(time.Now().UTC().UnixNano())
+	insult := ""
+	switch rand.Intn(4) + 1 {
+	case 1:
+		insult = fmt.Sprintf("%s, you %s like %s %s %s. - %s", users.To, verb, descriptor, adj, noun, users.From)
+	case 2:
+		insult = fmt.Sprintf("When god made %s, his primary source of inspiration was %s %s %s.  - %s", users.To, descriptor, adj, noun, users.From)
+	case 3:
+		insult = fmt.Sprintf("%s's fetishes involve %s %s %s.  - %s", users.To, descriptor, adj, noun, users.From)
+	case 4:
+		insult = fmt.Sprintf("I don't know what makes %s so stupid, but it's probably because they're %s %s %s. - %s", users.To, descriptor, adj, noun, users.From)
+	}
+
 	return insult
 }
