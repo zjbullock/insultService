@@ -2,3 +2,4 @@
 *.exe
 vendor/*
 insultDB.json
+secrets/*

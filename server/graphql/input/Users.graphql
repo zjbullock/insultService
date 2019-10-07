@@ -1,4 +1,5 @@
 input Users {
     to: String!
     from: String!
+    phoneNumber: String
 }
