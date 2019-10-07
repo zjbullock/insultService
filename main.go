@@ -39,13 +39,16 @@ func init() {
 	}
 	services := struct {
 		Insult service.Insult
+		Sms    service.SMS
 	}{
 		Insult: service.NewInsult(repos.fire, l),
+		Sms:    service.NewSMS(l, client, "https://api.twilio.com"),
 	}
 	handlerFuncs = &handler.Funcs{
 		Ctx: ctx,
 		Schema: graphql.MustParseSchema(schemaString, &resolver.Resolver{
 			Services: services,
+			Log:      l,
 		}),
 	}
 }
