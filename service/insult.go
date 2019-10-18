@@ -77,7 +77,7 @@ func insultMessage(users model.Users, adj, noun, verb string) string {
 	case 4:
 		insult = fmt.Sprintf("I don't know what makes %s so stupid, but it's probably because they're %s %s %s. - %s", users.To, descriptor, adj, noun, users.From)
 	case 5:
-		insult = fmt.Sprintf("Just %s you %s 4head. - %s", users.To, verb, adj)
+		insult = fmt.Sprintf("%s, just %s you %s 4head. - %s", users.To, verb, adj, users.From)
 	}
 
 	return insult
