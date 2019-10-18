@@ -5,14 +5,14 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/graph-gophers/graphql-go"
 	"github.com/juju/loggo"
+	"insultService/datasource"
+	"insultService/handler"
+	"insultService/repository"
+	"insultService/resolver"
+	"insultService/router"
+	"insultService/server"
+	"insultService/service"
 	"net/http"
-	"randomInsultService/datasource"
-	"randomInsultService/handler"
-	"randomInsultService/repository"
-	"randomInsultService/resolver"
-	"randomInsultService/router"
-	"randomInsultService/server"
-	"randomInsultService/service"
 )
 
 var (

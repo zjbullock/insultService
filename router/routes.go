@@ -1,8 +1,8 @@
 package router
 
 import (
+	"insultService/handler"
 	"net/http"
-	"randomInsultService/handler"
 )
 
 type route struct {

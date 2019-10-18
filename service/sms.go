@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/juju/loggo"
 	"github.com/pkg/errors"
+	"insultService/model"
+	"insultService/service/helper"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"randomInsultService/model"
-	"randomInsultService/service/helper"
 	"strings"
 )
 

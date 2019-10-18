@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/juju/loggo"
 	"github.com/pkg/errors"
-	"randomInsultService/model"
-	"randomInsultService/service"
-	"randomInsultService/service/helper"
+	"insultService/model"
+	"insultService/service"
+	"insultService/service/helper"
 )
 
 // Resolver is a struct that contains different Services to be used when resolving a graphql query or mutation

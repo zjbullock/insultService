@@ -5,7 +5,7 @@ import (
 	"context"
 	"github.com/juju/loggo"
 	"google.golang.org/api/option"
-	"randomInsultService/model"
+	"insultService/model"
 )
 
 // DataSource defines what functions we need from the database

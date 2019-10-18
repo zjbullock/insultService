@@ -7,9 +7,9 @@ import (
 	"github.com/go-test/deep"
 	"github.com/juju/loggo"
 	"github.com/stretchr/testify/assert"
-	"randomInsultService/datasource"
-	"randomInsultService/mocks"
-	"randomInsultService/model"
+	"insultService/datasource"
+	"insultService/mocks"
+	"insultService/model"
 	"testing"
 )
 

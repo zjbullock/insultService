@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"github.com/juju/loggo"
 	"github.com/pkg/errors"
+	"insultService/model"
 	"io/ioutil"
 	"os"
-	"randomInsultService/model"
 )
 
 func GetSecrets(log loggo.Logger) (*model.Secrets, error) {

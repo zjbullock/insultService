@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/juju/loggo"
-	"randomInsultService/datasource"
-	"randomInsultService/model"
+	"insultService/datasource"
+	"insultService/model"
 )
 
 // Firebase is an interface that contains methods pertaining to CRUD operations for FireStore db

@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gorilla/mux"
-	"randomInsultService/handler"
+	"insultService/handler"
 )
 
 func NewRouter(handler *handler.Funcs) *mux.Router {

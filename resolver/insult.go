@@ -2,7 +2,7 @@ package resolver
 
 import (
 	"context"
-	"randomInsultService/model"
+	"insultService/model"
 )
 
 type insultResolver struct {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
+	"insultService/service"
 	"net/http"
-	"randomInsultService/service"
 )
 
 type Funcs struct {
