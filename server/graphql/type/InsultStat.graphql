@@ -1,0 +1,20 @@
+type InsultStat {
+    verbs: [VerbCount]
+    adjectives: [AdjectiveCount]
+    nouns: [NounCount]
+}
+
+type VerbCount {
+    word: String!
+    count: Int!
+}
+
+type AdjectiveCount {
+    word: String!
+    count: Int!
+}
+
+type NounCount {
+    word: String!
+    count: Int!
+}
