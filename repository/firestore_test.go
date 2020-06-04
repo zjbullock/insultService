@@ -211,9 +211,9 @@ func TestFireStore_InsertEntry(t *testing.T) {
 			ds := &mocks.DataSource{}
 			ds.On("OpenConnection").Return(test.ds.openConnection)
 			ds.On("CloseConnection").Return(test.ds.closeConnection)
-			ds.On("InsertEntry", test.in.insultContent).Return(test.ds.insertEntry.doc, test.ds.insertEntry.res, test.ds.insertEntry.err)
+			ds.On("InsertInsultEntry", test.in.insultContent).Return(test.ds.insertEntry.doc, test.ds.insertEntry.res, test.ds.insertEntry.err)
 			test.fs.ds = ds
-			id, err := test.fs.InsertEntry(test.in.insultContent)
+			id, err := test.fs.InsertInsultEntry(test.in.insultContent)
 			testCase.Equal(test.expected.id, id)
 			testCase.Len(deep.Equal(test.expected.err, err), 0)
 

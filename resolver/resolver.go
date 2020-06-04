@@ -34,3 +34,11 @@ func (r *Resolver) GetInsult(ctx context.Context, args struct{ People *model.Use
 	}
 	return &insultResolver{Insult: insult}, err
 }
+
+func (r *Resolver) GetInsultStats(ctx context.Context) (*insultStatResolver, error) {
+	insultStat, err := r.Services.Insult.GetInsultsStats()
+	if err != nil {
+		return nil, err
+	}
+	return &insultStatResolver{InsultStat: *insultStat}, nil
+}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/juju/loggo"
+	"google.golang.org/api/iterator"
 	"insultService/datasource"
 	"insultService/model"
 )
@@ -11,7 +12,8 @@ import (
 // Firebase is an interface that contains methods pertaining to CRUD operations for FireStore db
 type FireStore interface {
 	ReadAllWords() (*model.Words, error)
-	InsertEntry(insultContent model.InsultContent) (*string, error)
+	InsertInsultEntry(insultContent model.InsultContent) (*string, error)
+	ReadInsults() ([]model.InsultContent, error)
 }
 
 type fireStore struct {
@@ -47,20 +49,47 @@ func (f *fireStore) ReadAllWords() (*model.Words, error) {
 	return &words, nil
 }
 
-// InsertEntry will insert a generated insult into the firestore DB and return a value corresponding to its ID
+// InsertInsultEntry will insert a generated insult into the firestore DB and return a value corresponding to its ID
 //  If unsuccessful, it will bubble up an error
-func (f *fireStore) InsertEntry(insultContent model.InsultContent) (*string, error) {
+func (f *fireStore) InsertInsultEntry(insultContent model.InsultContent) (*string, error) {
 	err := f.ds.OpenConnection()
 	if err != nil {
 		f.log.Errorf("error initializing datasource: %v", err)
 		return nil, errors.New(fmt.Sprintf("error Intializing data source: %v", err))
 	}
 	defer f.ds.CloseConnection()
-	d, _, err := f.ds.InsertEntry(insultContent)
+	d, _, err := f.ds.InsertEntry(insultContent, "insult")
 	if err != nil {
 		//Should allow error to bubble up upon failure
 		f.log.Errorf("failed to create an insult doc for write: %v", err)
 		return nil, errors.New(fmt.Sprintf("error inserting insult doc: %v.  received error: %v", insultContent, err))
 	}
 	return &d.ID, nil
+}
+
+func (f *fireStore) ReadInsults() (insultContents []model.InsultContent, err error) {
+	err = f.ds.OpenConnection()
+	if err != nil {
+		f.log.Errorf("error initializing datasource: %v", err)
+		return nil, errors.New(fmt.Sprintf("error Intializing data source: %v", err))
+	}
+	defer f.ds.CloseConnection()
+	d := f.ds.ReadCollection("insults")
+	defer d.Stop()
+	for {
+		doc, err := d.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			f.log.Errorf("failed to read document insult contents: %v", err)
+		}
+		var insultContent model.InsultContent
+		if err := doc.DataTo(&insultContent); err != nil {
+			f.log.Errorf("error converting document snap to an insult content model")
+			return nil, errors.New(fmt.Sprintf("error converting document snap to a model.InsultContent, :%v", err))
+		}
+		insultContents = append(insultContents, insultContent)
+	}
+	return insultContents, nil
 }

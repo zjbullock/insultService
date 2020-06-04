@@ -28,7 +28,7 @@ func (_m *DataSource) CloseConnection() error {
 	return r0
 }
 
-// InsertEntry provides a mock function with given fields: content
+// InsertInsultEntry provides a mock function with given fields: content
 func (_m *DataSource) InsertEntry(content model.InsultContent) (*firestore.DocumentRef, *firestore.WriteResult, error) {
 	ret := _m.Called(content)
 

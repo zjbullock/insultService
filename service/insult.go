@@ -6,12 +6,14 @@ import (
 	"insultService/model"
 	"insultService/repository"
 	"math/rand"
+	"sort"
 	"time"
 )
 
 // Insult is an interface that contains methods relating to insults
 type Insult interface {
 	GenerateInsult(who model.Users) (message *string, id *string, err error)
+	GetInsultsStats() (insultStat *model.InsultStat, err error)
 }
 
 type insult struct {
@@ -42,13 +44,60 @@ func (i *insult) GenerateInsult(who model.Users) (message *string, id *string, e
 	}
 	insult := insultMessage(who, adj, noun, verb)
 	//Should insert generated insult into firebase collection
-	id, err = i.fireStore.InsertEntry(insultContents)
+	id, err = i.fireStore.InsertInsultEntry(insultContents)
 	//Should produce an error if failed insert, but still return proper insult
 	if err != nil {
 		return &insult, nil, err
 	}
 
 	return &insult, id, nil
+}
+
+func (i *insult) GetInsultsStats() (insultStat *model.InsultStat, err error) {
+	insultContents, err := i.fireStore.ReadInsults()
+	var verbs map[string]int = make(map[string]int)
+	var nouns map[string]int = make(map[string]int)
+	var adjectives map[string]int = make(map[string]int)
+	for _, insultContent := range insultContents {
+		verbs[insultContent.Verb]++
+		nouns[insultContent.Noun]++
+		adjectives[insultContent.Adjective]++
+	}
+	var verbArray []model.VerbCount
+	for k, v := range verbs {
+		verbArray = append(verbArray, model.VerbCount{
+			Verb:  k,
+			Count: v,
+		})
+	}
+	var adjectiveArray []model.AdjectiveCount
+	for k, v := range adjectives {
+		adjectiveArray = append(adjectiveArray, model.AdjectiveCount{
+			Adjective: k,
+			Count:     v,
+		})
+	}
+	var nounArray []model.NounCount
+	for k, v := range nouns {
+		nounArray = append(nounArray, model.NounCount{
+			Noun:  k,
+			Count: v,
+		})
+	}
+	sort.Slice(verbArray, func(i, j int) bool {
+		return verbArray[i].Count < verbArray[j].Count
+	})
+	sort.Slice(adjectiveArray, func(i, j int) bool {
+		return adjectiveArray[i].Count < adjectiveArray[j].Count
+	})
+	sort.Slice(nounArray, func(i, j int) bool {
+		return nounArray[i].Count < nounArray[j].Count
+	})
+	return &model.InsultStat{
+		Adjectives: adjectiveArray,
+		Verbs:      verbArray,
+		Nouns:      nounArray,
+	}, nil
 }
 
 func randomWordChooser(words *model.Words) (adjective, noun, verb string) {

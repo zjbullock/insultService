@@ -5,7 +5,6 @@ import (
 	"context"
 	"github.com/juju/loggo"
 	"google.golang.org/api/option"
-	"insultService/model"
 )
 
 // DataSource defines what functions we need from the database
@@ -13,7 +12,8 @@ type DataSource interface {
 	OpenConnection() error
 	CloseConnection() error
 	ReadEntries() (*DocumentSnapshot, error)
-	InsertEntry(content model.InsultContent) (*DocumentRef, *WriteResult, error)
+	InsertEntry(content interface{}, collection string) (*DocumentRef, *WriteResult, error)
+	ReadCollection(collection string) *DocumentIterator
 }
 
 type fireStoreDB struct {
@@ -46,8 +46,8 @@ func (f *fireStoreDB) OpenConnection() error {
 	return nil
 }
 
-func (f *fireStoreDB) InsertEntry(content model.InsultContent) (*DocumentRef, *WriteResult, error) {
-	insults := f.client.Collection("insults")
+func (f *fireStoreDB) InsertEntry(content interface{}, collection string) (*DocumentRef, *WriteResult, error) {
+	insults := f.client.Collection(collection)
 	//Should insert generated insult into firestore
 	d, wr, err := insults.Add(f.ctx, content)
 	if err != nil {
@@ -58,13 +58,19 @@ func (f *fireStoreDB) InsertEntry(content model.InsultContent) (*DocumentRef, *W
 	return d, wr, nil
 }
 func (f *fireStoreDB) ReadEntries() (*DocumentSnapshot, error) {
-	words, err := f.client.Collection("insults").Doc("words").Get(f.ctx)
+	words, err := f.client.Collection("words").Doc("list").Get(f.ctx)
 	if err != nil {
 		f.log.Errorf("failed to read possible words with error: %v", err)
 		return nil, err
 	}
 	return words, nil
 }
+
+func (f *fireStoreDB) ReadCollection(collection string) *DocumentIterator {
+	insultContent := f.client.Collection(collection).Documents(f.ctx)
+	return insultContent
+}
+
 func (f *fireStoreDB) CloseConnection() error {
 	err := f.client.Close()
 	if err != nil {
