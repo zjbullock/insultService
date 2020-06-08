@@ -1,4 +1,5 @@
 type Insult {
     message: String
+    promotion: String
     fireStoreId: String
 }

@@ -1,8 +1,9 @@
 package model
 
 type Insult struct {
-	Message *string `json:"message"`
-	Id      *string `json:"fireStoreId"`
+	Message   *string `json:"message"`
+	Promotion *string `json:"promotion"`
+	Id        *string `json:"fireStoreId"`
 }
 
 type InsultContent struct {

@@ -14,6 +14,8 @@ import (
 type Insult interface {
 	GenerateInsult(who model.Users) (message *string, id *string, err error)
 	GetInsultsStats() (insultStat *model.InsultStat, err error)
+	GetUserInfo(userID string) (userInfo *model.UserInfo, err error)
+	IncreaseUserExperience(userID string) (message *string, err error)
 }
 
 type insult struct {
@@ -51,6 +53,46 @@ func (i *insult) GenerateInsult(who model.Users) (message *string, id *string, e
 	}
 
 	return &insult, id, nil
+}
+
+func (i *insult) IncreaseUserExperience(userID string) (*string, error) {
+	//Check User Info and if they don't exist, save a new update
+	titles, err := i.fireStore.ReadTitles()
+	userInfoList, err := i.fireStore.ReadUserInfo([]model.QueryArg{{Path: "username", Op: "==", Value: userID}})
+	if err != nil {
+		i.log.Errorf("error retrieving profile with corresponding username and password")
+		return nil, err
+	}
+	if len(userInfoList) == 0 {
+		userInfo := model.UserInfo{
+			Name:       userID,
+			Rank:       determineTitle(1, *titles),
+			Experience: 1,
+		}
+		i.log.Infof("userInfo: %v", userInfo)
+		err = i.fireStore.UpdateUserInfo(&userInfo)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create user with error: %v", err)
+		}
+		message := fmt.Sprintf("Welcome!  Successfully Created a new user of the Insult Bot!  Your Current Rank is: %s", userInfo.Rank)
+		return &message, nil
+	}
+	//If user exists, increment their exp by 1
+	userInfo := userInfoList[0]
+	userInfo.Experience++
+	//Check to see if user's current exp matches a new rank requirement
+	newRank := determineTitle(userInfo.Experience, *titles)
+	var message *string
+	if newRank != userInfo.Rank {
+		rankMessage := fmt.Sprintf("Congrats!  You have obtained the rank of: %s", newRank)
+		userInfo.Rank = newRank
+		message = &rankMessage
+	}
+	err = i.fireStore.UpdateUserInfo(userInfo)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update user with error: %v", err)
+	}
+	return message, nil
 }
 
 func (i *insult) GetInsultsStats() (insultStat *model.InsultStat, err error) {
@@ -98,6 +140,28 @@ func (i *insult) GetInsultsStats() (insultStat *model.InsultStat, err error) {
 		Verbs:      verbArray,
 		Nouns:      nounArray,
 	}, nil
+}
+
+func (i *insult) GetUserInfo(userID string) (userInfo *model.UserInfo, err error) {
+	userInfoList, err := i.fireStore.ReadUserInfo([]model.QueryArg{{Path: "username", Op: "==", Value: userID}})
+	if err != nil {
+		i.log.Errorf("error retrieving user with this username")
+		return nil, err
+	}
+	if len(userInfoList) == 0 {
+		return nil, fmt.Errorf("no such username exists")
+	}
+	return userInfoList[0], nil
+}
+
+func determineTitle(exp int, titles model.Titles) string {
+	rank := ""
+	for _, title := range titles.Titles {
+		if exp >= title.Experience {
+			rank = title.Name
+		}
+	}
+	return rank
 }
 
 func randomWordChooser(words *model.Words) (adjective, noun, verb string) {
