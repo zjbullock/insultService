@@ -1,0 +1,5 @@
+type UserInfo {
+    name: String!
+    rank: String!
+    experience: Int!
+}

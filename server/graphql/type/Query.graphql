@@ -1,4 +1,5 @@
 type Query {
     GetInsult(people: Users!): Insult!
     GetInsultStats: InsultStat!
+    GetUserInfo(userID: String!): UserInfo
 }
