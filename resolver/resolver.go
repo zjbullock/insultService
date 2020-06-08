@@ -28,11 +28,20 @@ func (r *Resolver) GetInsult(ctx context.Context, args struct{ People *model.Use
 		}
 		r.Services.Sms.SendText(*args.People.PhoneNumber, *message, secrets)
 	}
+	promotion, err := r.Services.Insult.IncreaseUserExperience(args.People.From)
+
 	insult := model.Insult{
-		Message: message,
-		Id:      id,
+		Message:   message,
+		Promotion: promotion,
+		Id:        id,
 	}
 	return &insultResolver{Insult: insult}, err
+}
+
+func (r *Resolver) GetUserInfo(ctx context.Context, args struct{ UserID string }) (*userInfoResolver, error) {
+	userInfo, err := r.Services.Insult.GetUserInfo(args.UserID)
+	r.Log.Infof("userInfo: %v", userInfo)
+	return &userInfoResolver{UserInfo: *userInfo}, err
 }
 
 func (r *Resolver) GetInsultStats(ctx context.Context) (*insultStatResolver, error) {
