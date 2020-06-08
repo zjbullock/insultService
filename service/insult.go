@@ -64,17 +64,11 @@ func (i *insult) IncreaseUserExperience(userID string) (*string, error) {
 		return nil, err
 	}
 	if len(userInfoList) == 0 {
-		userInfo := model.UserInfo{
-			Name:       userID,
-			Rank:       determineTitle(1, *titles),
-			Experience: 1,
-		}
-		i.log.Infof("userInfo: %v", userInfo)
-		err = i.fireStore.UpdateUserInfo(&userInfo)
+		_, err = i.generateNewUser(userID, titles)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create user with error: %v", err)
+			return nil, err
 		}
-		message := fmt.Sprintf("Welcome!  Successfully Created a new user of the Insult Bot!  Your Current Rank is: %s", userInfo.Rank)
+		message := fmt.Sprintf("Welcome!  Successfully Created a new user of the Insult Bot!  Your Current Rank is: %s", titles.Titles[0].Name)
 		return &message, nil
 	}
 	//If user exists, increment their exp by 1
@@ -143,15 +137,35 @@ func (i *insult) GetInsultsStats() (insultStat *model.InsultStat, err error) {
 }
 
 func (i *insult) GetUserInfo(userID string) (userInfo *model.UserInfo, err error) {
+	titles, err := i.fireStore.ReadTitles()
 	userInfoList, err := i.fireStore.ReadUserInfo([]model.QueryArg{{Path: "username", Op: "==", Value: userID}})
 	if err != nil {
 		i.log.Errorf("error retrieving user with this username")
 		return nil, err
 	}
 	if len(userInfoList) == 0 {
-		return nil, fmt.Errorf("no such username exists")
+		userInfo, err = i.generateNewUser(userID, titles)
+		if err != nil {
+			return nil, err
+		}
+		return userInfo, nil
 	}
+
 	return userInfoList[0], nil
+}
+
+func (i *insult) generateNewUser(userID string, titles *model.Titles) (*model.UserInfo, error) {
+	userInfo := model.UserInfo{
+		Name:       userID,
+		Rank:       determineTitle(1, *titles),
+		Experience: 1,
+	}
+	i.log.Infof("userInfo: %v", userInfo)
+	err := i.fireStore.UpdateUserInfo(&userInfo)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create user with error: %v", err)
+	}
+	return &userInfo, nil
 }
 
 func determineTitle(exp int, titles model.Titles) string {
