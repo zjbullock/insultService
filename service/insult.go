@@ -199,7 +199,10 @@ func determineTitle(exp int, titles model.Titles) string {
 func (i *insult) randomWordChooser(words *model.Words, adjCount int) (adjective, noun, verb string) {
 	adjList := ""
 	for word := 0; word < adjCount; word++ {
-		adjList += words.Adjective[i.rand.Intn(len(words.Adjective))] + " "
+		adjList += words.Adjective[i.rand.Intn(len(words.Adjective))]
+		if word != adjCount-1 {
+			adjList += ", "
+		}
 	}
 	adjective = strings.TrimSpace(adjList)
 	noun = words.Noun[i.rand.Intn(len(words.Noun))]
