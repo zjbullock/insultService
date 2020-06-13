@@ -12,7 +12,9 @@ import (
 	"insultService/router"
 	"insultService/server"
 	"insultService/service"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 var (
@@ -31,7 +33,7 @@ func init() {
 	}
 	projectId := "insult"
 	dataSource := datasource.NewDataSource(l, ctx, projectId)
-
+	r := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
 	repos := struct {
 		fire repository.FireStore
 	}{
@@ -41,7 +43,7 @@ func init() {
 		Insult service.Insult
 		Sms    service.SMS
 	}{
-		Insult: service.NewInsult(repos.fire, l),
+		Insult: service.NewInsult(repos.fire, l, *r),
 		Sms:    service.NewSMS(l, client, "https://api.twilio.com"),
 	}
 	handlerFuncs = &handler.Funcs{

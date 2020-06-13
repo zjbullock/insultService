@@ -7,44 +7,62 @@ import (
 	"insultService/repository"
 	"math/rand"
 	"sort"
-	"time"
+	"strings"
 )
 
 // Insult is an interface that contains methods relating to insults
 type Insult interface {
-	GenerateInsult(who model.Users) (message *string, id *string, err error)
+	GenerateInsult(who model.Users, rank string) (message *string, id *string, err error)
 	GetInsultsStats() (insultStat *model.InsultStat, err error)
 	GetUserInfo(userID string) (userInfo *model.UserInfo, err error)
 	IncreaseUserExperience(userID string) (message *string, err error)
+	randomWordChooser(words *model.Words, adjCount int) (adjective, noun, verb string)
 }
 
 type insult struct {
 	fireStore repository.FireStore
 	log       loggo.Logger
+	rand      rand.Rand
 }
 
 // NewInsult creates a new insult service
-func NewInsult(fire repository.FireStore, log loggo.Logger) Insult {
+func NewInsult(fire repository.FireStore, log loggo.Logger, rand rand.Rand) Insult {
 	return &insult{
 		fireStore: fire,
 		log:       log,
+		rand:      rand,
 	}
 }
 
 // GenerateInsult returns a string with a generated insult and an error bubbled up from firestore if any
-func (i *insult) GenerateInsult(who model.Users) (message *string, id *string, err error) {
+func (i *insult) GenerateInsult(who model.Users, rank string) (message *string, id *string, err error) {
 	//Should generate an Insult
+	titles, err := i.fireStore.ReadTitles()
+	if err != nil {
+		return nil, nil, err
+	}
 	words, err := i.fireStore.ReadAllWords()
 	if err != nil {
 		return nil, nil, err
 	}
-	adj, noun, verb := randomWordChooser(words)
+
+	adjCount := 1
+	i.log.Infof("%v", titles.Titles)
+	for _, title := range titles.Titles {
+		if rank != title.Name {
+			adjCount++
+		} else if rank == title.Name {
+			break
+		}
+	}
+
+	adj, noun, verb := i.randomWordChooser(words, adjCount)
 	insultContents := model.InsultContent{
 		Verb:      verb,
 		Adjective: adj,
 		Noun:      noun,
 	}
-	insult := insultMessage(who, adj, noun, verb)
+	insult := insultMessage(who, adj, noun, verb, i.rand)
 	//Should insert generated insult into firebase collection
 	id, err = i.fireStore.InsertInsultEntry(insultContents)
 	//Should produce an error if failed insert, but still return proper insult
@@ -178,23 +196,25 @@ func determineTitle(exp int, titles model.Titles) string {
 	return rank
 }
 
-func randomWordChooser(words *model.Words) (adjective, noun, verb string) {
-	rand.Seed(time.Now().UTC().UnixNano())
-	adjective = words.Adjective[rand.Intn(len(words.Adjective))]
-	noun = words.Noun[rand.Intn(len(words.Noun))]
-	verb = words.Verb[rand.Intn(len(words.Verb))]
+func (i *insult) randomWordChooser(words *model.Words, adjCount int) (adjective, noun, verb string) {
+	adjList := ""
+	for word := 0; word < adjCount; word++ {
+		adjList += words.Adjective[i.rand.Intn(len(words.Adjective))] + " "
+	}
+	adjective = strings.TrimSpace(adjList)
+	noun = words.Noun[i.rand.Intn(len(words.Noun))]
+	verb = words.Verb[i.rand.Intn(len(words.Verb))]
 	return adjective, noun, verb
 }
 
-func insultMessage(users model.Users, adj, noun, verb string) string {
+func insultMessage(users model.Users, adj, noun, verb string, random rand.Rand) string {
 	descriptor := "a"
 	switch adj[0] {
 	case 'a', 'e', 'i', 'o', 'u':
 		descriptor += "n"
 	}
-	rand.Seed(time.Now().UTC().UnixNano())
 	insult := ""
-	switch rand.Intn(5) + 1 {
+	switch random.Intn(8) + 1 {
 	case 1:
 		insult = fmt.Sprintf("%s, you %s like %s %s %s. - %s", users.To, verb, descriptor, adj, noun, users.From)
 	case 2:
@@ -205,6 +225,12 @@ func insultMessage(users model.Users, adj, noun, verb string) string {
 		insult = fmt.Sprintf("I don't know what makes %s so stupid, but it's probably because they're %s %s %s. - %s", users.To, descriptor, adj, noun, users.From)
 	case 5:
 		insult = fmt.Sprintf("%s, just %s you %s 4head. - %s", users.To, verb, adj, users.From)
+	case 6:
+		insult = fmt.Sprintf("%s's brain is so odd, that if doctors cracked their head open, they'd think it was a %s %s - %s", users.To, adj, noun, users.From)
+	case 7:
+		insult = fmt.Sprintf("I truly want to believe the world is a good place, but I'm constantly reminded that %s %ss like %s exists in it.  - %s", adj, noun, users.To, users.From)
+	case 8:
+		insult = fmt.Sprintf("%s is as ugly as %s %s %s - %s", users.To, descriptor, adj, noun, users.From)
 	}
 
 	return insult

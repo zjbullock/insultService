@@ -20,7 +20,12 @@ type Resolver struct {
 
 // GetInsult resolves an insult if any, and an error from the backend if present
 func (r *Resolver) GetInsult(ctx context.Context, args struct{ People *model.Users }) (*insultResolver, error) {
-	message, id, err := r.Services.Insult.GenerateInsult(*args.People)
+	userInfo, err := r.Services.Insult.GetUserInfo(args.People.From)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error getting userInfo")
+	}
+
+	message, id, err := r.Services.Insult.GenerateInsult(*args.People, userInfo.Rank)
 	if args.People.PhoneNumber != nil {
 		secrets, err := helper.GetSecrets(r.Log)
 		if err != nil {
