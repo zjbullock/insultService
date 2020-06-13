@@ -175,8 +175,8 @@ func (i *insult) GetUserInfo(userID string) (userInfo *model.UserInfo, err error
 func (i *insult) generateNewUser(userID string, titles *model.Titles) (*model.UserInfo, error) {
 	userInfo := model.UserInfo{
 		Name:       userID,
-		Rank:       determineTitle(1, *titles),
-		Experience: 1,
+		Rank:       determineTitle(0, *titles),
+		Experience: 0,
 	}
 	i.log.Infof("userInfo: %v", userInfo)
 	err := i.fireStore.UpdateUserInfo(&userInfo)
