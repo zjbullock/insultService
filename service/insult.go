@@ -49,7 +49,7 @@ func (i *insult) GenerateInsult(who model.Users, rank string) (message *string, 
 	adjCount := 1
 	i.log.Infof("%v", titles.Titles)
 	for _, title := range titles.Titles {
-		if rank != title.Name {
+		if rank != title.Name && adjCount < 2 {
 			adjCount++
 		} else if rank == title.Name {
 			break
