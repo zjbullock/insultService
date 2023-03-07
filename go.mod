@@ -7,7 +7,7 @@ require (
 	github.com/go-test/deep v1.0.5
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.4
-	github.com/graph-gophers/graphql-go v0.0.0-20200309224638-dae41bde9ef9
+	github.com/graph-gophers/graphql-go v1.3.0
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.5.1
